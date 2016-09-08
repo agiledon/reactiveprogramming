@@ -15,7 +15,10 @@ object Boot extends App {
   val receiver = system.actorOf(Props(new WordCounterReceiver))
   val client = system.actorOf(Props(new WordCounterClient))
 
-  client ! StartAnalysisWebPages(Seq("http://www.baidu.com", "http://www.jianshu.com"), receiver)
+  client ! StartAnalysisWebPages(Seq(
+    "http://www.scala-lang.org/",
+    "http://doc.akka.io/docs/akka/snapshot/contrib/aggregator.html",
+    "http://doc.akka.io/docs/akka/2.4/scala/routing.html"), receiver)
 
   Thread.sleep(10000)
   system.shutdown()
