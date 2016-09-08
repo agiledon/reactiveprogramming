@@ -7,8 +7,15 @@
 \*                                                                      */
 package com.bigeyedata.reactiveprogramming
 
-import akka.actor.{Actor, ActorLogging}
-import com.bigeyedata.reactiveprogramming.Messages.{AnalysisResultsFetched, FetchWebPages, StartAnalysisWebPages}
+import akka.actor.{ActorRef, Props, Actor, ActorLogging}
+import com.bigeyedata.reactiveprogramming.WordCounterClient._
+import com.bigeyedata.reactiveprogramming.WordCounterReceiver.FetchWebPages
+
+object WordCounterClient {
+  def props = Props(new WordCounterClient)
+  case class StartAnalysisWebPages(uris: Seq[String], requestReceiver: ActorRef)
+  case class AnalysisResultsFetched(result: Long)
+}
 
 class WordCounterClient extends Actor with ActorLogging {
   def receive: Receive = {

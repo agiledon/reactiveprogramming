@@ -8,12 +8,12 @@
 package com.bigeyedata.reactiveprogramming
 
 import akka.actor.{Props, ActorSystem}
-import com.bigeyedata.reactiveprogramming.Messages.StartAnalysisWebPages
+import com.bigeyedata.reactiveprogramming.WordCounterClient._
 
 object Boot extends App {
   val system = ActorSystem("wordCounter")
   val receiver = system.actorOf(Props(new WordCounterReceiver))
-  val client = system.actorOf(Props(new WordCounterClient))
+  val client = system.actorOf(WordCounterClient.props)
 
   client ! StartAnalysisWebPages(Seq(
     "http://www.scala-lang.org/",

@@ -9,10 +9,19 @@ package com.bigeyedata.reactiveprogramming
 
 import akka.actor.{ActorLogging, Actor, ActorRef, Props}
 import akka.routing.RoundRobinPool
-import com.bigeyedata.reactiveprogramming.Messages.{AnalysisResultsFetched, AnalysisAggregatedResult, FetchWebPages, StartAggregation}
+import com.bigeyedata.reactiveprogramming.WordCounterAggregator.StartAggregation
+import com.bigeyedata.reactiveprogramming.WordCounterClient.AnalysisResultsFetched
+import com.bigeyedata.reactiveprogramming.WordCounterReceiver.{AnalysisAggregatedResult, FetchWebPages}
+
+object WordCounterReceiver {
+  def props: Props = Props(new WordCounterReceiver)
+
+  case class FetchWebPages(uris: Seq[String], sender: ActorRef)
+  case class AnalysisAggregatedResult(count: Long)
+}
 
 class WordCounterReceiver extends Actor with ActorLogging {
-  val aggregator: ActorRef = context.actorOf(Props(new WordCounterAggregator), "aggregator")
+  val aggregator: ActorRef = context.actorOf(WordCounterAggregator.props, "aggregator")
   val analyst: ActorRef = context.actorOf(Props(new PageContentAnalyst(aggregator)), "PageContentAnalyst")
   val fetchers = context.actorOf(RoundRobinPool(4).props(Props(new PageContentFetcher(analyst))), "fetchers")
   var totalCount: Long = 0

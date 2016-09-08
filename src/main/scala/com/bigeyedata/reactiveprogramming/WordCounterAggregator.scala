@@ -7,12 +7,22 @@
 \*                                                                      */
 package com.bigeyedata.reactiveprogramming
 
-import akka.actor.{ActorRef, Actor}
+import akka.actor.{Props, ActorRef, Actor}
 import akka.util.Timeout
+import com.bigeyedata.reactiveprogramming.PageContentFetcher.FetchPageContent
+import com.bigeyedata.reactiveprogramming.WordCounterAggregator.{AnalysisResult, BadCommand, StartAggregation}
+import com.bigeyedata.reactiveprogramming.WordCounterReceiver.AnalysisAggregatedResult
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import akka.contrib.pattern.Aggregator
-import com.bigeyedata.reactiveprogramming.Messages._
+
+object WordCounterAggregator {
+  def props: Props = Props(new WordCounterAggregator)
+
+  case class StartAggregation(target: ActorRef, uris: Seq[String])
+  case object BadCommand
+  case class AnalysisResult(count: Long)
+}
 
 class WordCounterAggregator extends Actor with Aggregator {
   expectOnce {

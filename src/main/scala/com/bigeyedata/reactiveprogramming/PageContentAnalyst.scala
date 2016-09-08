@@ -7,8 +7,13 @@
 \*                                                                      */
 package com.bigeyedata.reactiveprogramming
 
-import akka.actor.{ActorLogging, ActorRef, Actor}
-import com.bigeyedata.reactiveprogramming.Messages.{AnalysisResult, AnalysisWebPage}
+import akka.actor.{Actor, ActorLogging, ActorRef}
+import com.bigeyedata.reactiveprogramming.PageContentAnalyst.AnalysisWebPage
+import com.bigeyedata.reactiveprogramming.WordCounterAggregator.AnalysisResult
+
+object PageContentAnalyst {
+  case class AnalysisWebPage(content: List[String])
+}
 
 class PageContentAnalyst(mediator: ActorRef) extends Actor with ActorLogging {
   def receive: Receive = {
