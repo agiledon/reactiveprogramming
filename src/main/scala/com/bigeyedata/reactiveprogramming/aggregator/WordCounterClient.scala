@@ -5,11 +5,11 @@
 **     |_|\/|_\____|_|\_\ |_|           http://www.bigeyedata.com       **
 **                                                                      **
 \*                                                                      */
-package com.bigeyedata.reactiveprogramming
+package com.bigeyedata.reactiveprogramming.aggregator
 
-import akka.actor.{ActorRef, Props, Actor, ActorLogging}
-import com.bigeyedata.reactiveprogramming.WordCounterClient._
-import com.bigeyedata.reactiveprogramming.WordCounterReceiver.FetchWebPages
+import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import com.bigeyedata.reactiveprogramming.aggregator.WordCounterClient.{AnalysisResultsFetched, StartAnalysisWebPages}
+import com.bigeyedata.reactiveprogramming.aggregator.WordCounterReceiver.FetchWebPages
 
 object WordCounterClient {
   def props = Props(new WordCounterClient)

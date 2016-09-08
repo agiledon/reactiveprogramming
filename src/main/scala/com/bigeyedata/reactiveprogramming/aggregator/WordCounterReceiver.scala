@@ -5,24 +5,24 @@
 **     |_|\/|_\____|_|\_\ |_|           http://www.bigeyedata.com       **
 **                                                                      **
 \*                                                                      */
-package com.bigeyedata.reactiveprogramming
+package com.bigeyedata.reactiveprogramming.aggregator
 
-import akka.actor.{ActorLogging, Actor, ActorRef, Props}
+import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.routing.RoundRobinPool
-import com.bigeyedata.reactiveprogramming.WordCounterAggregator.StartAggregation
-import com.bigeyedata.reactiveprogramming.WordCounterClient.AnalysisResultsFetched
-import com.bigeyedata.reactiveprogramming.WordCounterReceiver.{AnalysisAggregatedResult, FetchWebPages}
+import com.bigeyedata.reactiveprogramming.aggregator.WordCounterAggregator.StartAggregation
+import com.bigeyedata.reactiveprogramming.aggregator.WordCounterClient.AnalysisResultsFetched
+import com.bigeyedata.reactiveprogramming.aggregator.WordCounterReceiver.{AggregatedAnalysisResult, FetchWebPages}
 
 object WordCounterReceiver {
   def props: Props = Props(new WordCounterReceiver)
 
   case class FetchWebPages(uris: Seq[String], sender: ActorRef)
-  case class AnalysisAggregatedResult(count: Long)
+  case class AggregatedAnalysisResult(count: Long)
 }
 
 class WordCounterReceiver extends Actor with ActorLogging {
   val aggregator: ActorRef = context.actorOf(WordCounterAggregator.props, "aggregator")
-  val analyst: ActorRef = context.actorOf(Props(new PageContentAnalyst(aggregator)), "PageContentAnalyst")
+  val analyst: ActorRef = context.actorOf(Props(new ContentWordCounter(aggregator)), "PageContentAnalyst")
   val fetchers = context.actorOf(RoundRobinPool(4).props(Props(new PageContentFetcher(analyst))), "fetchers")
   var totalCount: Long = 0
   var client: ActorRef = _
@@ -31,7 +31,7 @@ class WordCounterReceiver extends Actor with ActorLogging {
     case FetchWebPages(urls, clientActor) =>
       client = clientActor
       aggregator ! StartAggregation(fetchers, urls)
-    case AnalysisAggregatedResult(totalCount) =>
+    case AggregatedAnalysisResult(totalCount) =>
       log.info(s"the total count is ${totalCount}")
       client ! AnalysisResultsFetched(totalCount)
   }

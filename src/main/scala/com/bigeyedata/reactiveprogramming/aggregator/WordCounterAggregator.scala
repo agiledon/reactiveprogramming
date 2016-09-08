@@ -5,16 +5,17 @@
 **     |_|\/|_\____|_|\_\ |_|           http://www.bigeyedata.com       **
 **                                                                      **
 \*                                                                      */
-package com.bigeyedata.reactiveprogramming
+package com.bigeyedata.reactiveprogramming.aggregator
 
-import akka.actor.{Props, ActorRef, Actor}
-import akka.util.Timeout
-import com.bigeyedata.reactiveprogramming.PageContentFetcher.FetchPageContent
-import com.bigeyedata.reactiveprogramming.WordCounterAggregator.{AnalysisResult, BadCommand, StartAggregation}
-import com.bigeyedata.reactiveprogramming.WordCounterReceiver.AnalysisAggregatedResult
-import scala.concurrent.duration._
-import scala.concurrent.ExecutionContext.Implicits.global
+import akka.actor.{Actor, ActorRef, Props}
 import akka.contrib.pattern.Aggregator
+import akka.util.Timeout
+import com.bigeyedata.reactiveprogramming.aggregator.PageContentFetcher.FetchPageContent
+import com.bigeyedata.reactiveprogramming.aggregator.WordCounterAggregator.{AnalysisResult, BadCommand, StartAggregation}
+import com.bigeyedata.reactiveprogramming.aggregator.WordCounterReceiver.AggregatedAnalysisResult
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
 object WordCounterAggregator {
   def props: Props = Props(new WordCounterAggregator)
@@ -53,7 +54,7 @@ class WordCounterAggregator extends Actor with Aggregator {
 
     def respondIfDone(respondAnyway: Boolean = false) = {
       if (respondAnyway || analysisResults.size == urls.size) {
-        originalSender ! AnalysisAggregatedResult(analysisResults.map(_.count).sum)
+        originalSender ! AggregatedAnalysisResult(analysisResults.map(_.count).sum)
         context stop self
       }
     }

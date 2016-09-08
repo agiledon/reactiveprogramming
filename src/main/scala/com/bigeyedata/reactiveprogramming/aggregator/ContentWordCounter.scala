@@ -5,23 +5,21 @@
 **     |_|\/|_\____|_|\_\ |_|           http://www.bigeyedata.com       **
 **                                                                      **
 \*                                                                      */
-package com.bigeyedata.reactiveprogramming
+package com.bigeyedata.reactiveprogramming.aggregator
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
-import com.bigeyedata.reactiveprogramming.PageContentAnalyst.AnalysisWebPage
-import com.bigeyedata.reactiveprogramming.PageContentFetcher.FetchPageContent
+import com.bigeyedata.reactiveprogramming.aggregator.ContentWordCounter.CountPageContent
+import com.bigeyedata.reactiveprogramming.aggregator.WordCounterAggregator.AnalysisResult
 
-import scala.io.Source
-
-object PageContentFetcher {
-  case class FetchPageContent(uri: String)
+object ContentWordCounter {
+  case class CountPageContent(content: List[String])
 }
 
-class PageContentFetcher(analyst: ActorRef) extends Actor with ActorLogging {
+class ContentWordCounter(mediator: ActorRef) extends Actor with ActorLogging {
   def receive: Receive = {
-    case FetchPageContent(uri) =>
-      val content = Source.fromURL(uri).getLines().toList
-      log.info(s"fetch url content $uri")
-      analyst ! AnalysisWebPage(content)
+    case CountPageContent(content) =>
+      val count = content.flatMap(l => l.split(" ")).distinct.size
+      log.info(s"the count of page is $count")
+      mediator ! AnalysisResult(count)
   }
 }

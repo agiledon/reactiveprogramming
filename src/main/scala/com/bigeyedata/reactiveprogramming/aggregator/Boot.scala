@@ -5,10 +5,10 @@
 **     |_|\/|_\____|_|\_\ |_|           http://www.bigeyedata.com       **
 **                                                                      **
 \*                                                                      */
-package com.bigeyedata.reactiveprogramming
+package com.bigeyedata.reactiveprogramming.aggregator
 
-import akka.actor.{Props, ActorSystem}
-import com.bigeyedata.reactiveprogramming.WordCounterClient._
+import akka.actor.{ActorSystem, Props}
+import com.bigeyedata.reactiveprogramming.aggregator.WordCounterClient.StartAnalysisWebPages
 
 object Boot extends App {
   val system = ActorSystem("wordCounter")
