@@ -28,9 +28,9 @@ class WordCounterReceiver extends Actor with ActorLogging {
   var client: ActorRef = _
 
   def receive: Receive = {
-    case FetchWebPages(uris, clientActor) =>
+    case FetchWebPages(urls, clientActor) =>
       client = clientActor
-      aggregator ! StartAggregation(fetchers, uris)
+      aggregator ! StartAggregation(fetchers, urls)
     case AnalysisAggregatedResult(totalCount) =>
       log.info(s"the total count is ${totalCount}")
       client ! AnalysisResultsFetched(totalCount)

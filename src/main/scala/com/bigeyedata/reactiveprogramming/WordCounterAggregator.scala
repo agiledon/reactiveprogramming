@@ -19,21 +19,21 @@ import akka.contrib.pattern.Aggregator
 object WordCounterAggregator {
   def props: Props = Props(new WordCounterAggregator)
 
-  case class StartAggregation(target: ActorRef, uris: Seq[String])
+  case class StartAggregation(target: ActorRef, urls: Seq[String])
   case object BadCommand
   case class AnalysisResult(count: Long)
 }
 
 class WordCounterAggregator extends Actor with Aggregator {
   expectOnce {
-    case StartAggregation(target, uris) =>
-      new Handler(target, uris, sender)
+    case StartAggregation(target, urls) =>
+      new Handler(target, urls, sender)
     case _ =>
       sender ! BadCommand
       context stop self
   }
 
-  class Handler(target: ActorRef, uris: Seq[String], originalSender: ActorRef) {
+  class Handler(target: ActorRef, urls: Seq[String], originalSender: ActorRef) {
     var analysisResults = Set.empty[AnalysisResult]
 
     context.system.scheduler.scheduleOnce(10.seconds, self, Timeout)
@@ -42,7 +42,7 @@ class WordCounterAggregator extends Actor with Aggregator {
         respondIfDone(respondAnyway = true)
     }
 
-    uris.foreach { uri =>
+    urls.foreach { uri =>
       target ! FetchPageContent(uri)
       expectOnce {
         case result: AnalysisResult =>
@@ -52,7 +52,7 @@ class WordCounterAggregator extends Actor with Aggregator {
     }
 
     def respondIfDone(respondAnyway: Boolean = false) = {
-      if (respondAnyway || analysisResults.size == uris.size) {
+      if (respondAnyway || analysisResults.size == urls.size) {
         originalSender ! AnalysisAggregatedResult(analysisResults.map(_.count).sum)
         context stop self
       }
