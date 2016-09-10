@@ -11,16 +11,16 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.routing.RoundRobinPool
 import com.bigeyedata.reactiveprogramming.aggregator.WordCounterAggregator.StartAggregation
 import com.bigeyedata.reactiveprogramming.aggregator.WordCounterClient.AnalysisResultsFetched
-import com.bigeyedata.reactiveprogramming.aggregator.WordCounterReceiver.{AggregatedAnalysisResult, FetchWebPages}
+import com.bigeyedata.reactiveprogramming.aggregator.WordCounterServer.{AggregatedAnalysisResult, FetchWebPages}
 
-object WordCounterReceiver {
-  def props: Props = Props(new WordCounterReceiver)
+object WordCounterServer {
+  def props: Props = Props(new WordCounterServer)
 
   case class FetchWebPages(uris: Seq[String], sender: ActorRef)
   case class AggregatedAnalysisResult(count: Long)
 }
 
-class WordCounterReceiver extends Actor with ActorLogging {
+class WordCounterServer extends Actor with ActorLogging {
   val aggregator: ActorRef = context.actorOf(WordCounterAggregator.props, "aggregator")
   val analyst: ActorRef = context.actorOf(Props(new ContentWordCounter(aggregator)), "PageContentAnalyst")
   val fetchers = context.actorOf(RoundRobinPool(4).props(Props(new PageContentFetcher(analyst))), "fetchers")

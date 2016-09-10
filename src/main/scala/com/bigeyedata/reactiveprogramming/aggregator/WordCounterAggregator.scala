@@ -12,7 +12,7 @@ import akka.contrib.pattern.Aggregator
 import akka.util.Timeout
 import com.bigeyedata.reactiveprogramming.aggregator.PageContentFetcher.FetchPageContent
 import com.bigeyedata.reactiveprogramming.aggregator.WordCounterAggregator.{AnalysisResult, BadCommand, StartAggregation}
-import com.bigeyedata.reactiveprogramming.aggregator.WordCounterReceiver.AggregatedAnalysisResult
+import com.bigeyedata.reactiveprogramming.aggregator.WordCounterServer.AggregatedAnalysisResult
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._

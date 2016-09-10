@@ -12,13 +12,13 @@ import com.bigeyedata.reactiveprogramming.aggregator.WordCounterClient.StartAnal
 
 object Boot extends App {
   val system = ActorSystem("wordCounter")
-  val receiver = system.actorOf(Props(new WordCounterReceiver))
-  val client = system.actorOf(WordCounterClient.props)
+  val server = system.actorOf(Props(new WordCounterServer), "server")
+  val client = system.actorOf(WordCounterClient.props, "client")
 
   client ! StartAnalysisWebPages(Seq(
     "http://www.scala-lang.org/",
     "http://doc.akka.io/docs/akka/snapshot/contrib/aggregator.html",
-    "http://doc.akka.io/docs/akka/2.4/scala/routing.html"), receiver)
+    "http://doc.akka.io/docs/akka/2.4/scala/routing.html"), server)
 
   Thread.sleep(10000)
   system.shutdown()
