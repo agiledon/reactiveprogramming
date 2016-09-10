@@ -20,6 +20,6 @@ object Boot extends App {
     "http://doc.akka.io/docs/akka/snapshot/contrib/aggregator.html",
     "http://doc.akka.io/docs/akka/2.4/scala/routing.html"), server)
 
-  Thread.sleep(10000)
+  Thread.sleep(20000)
   system.shutdown()
 }
