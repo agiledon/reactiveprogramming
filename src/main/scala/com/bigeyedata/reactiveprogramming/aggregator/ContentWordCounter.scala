@@ -15,11 +15,11 @@ object ContentWordCounter {
   case class CountPageContent(content: List[String])
 }
 
-class ContentWordCounter(mediator: ActorRef) extends Actor with ActorLogging {
+class ContentWordCounter(aggregator: ActorRef) extends Actor with ActorLogging {
   def receive: Receive = {
     case CountPageContent(content) =>
       val count = content.flatMap(l => l.split(" ")).distinct.size
       log.info(s"the count of page is $count")
-      mediator ! AnalysisResult(count)
+      aggregator ! AnalysisResult(count)
   }
 }
