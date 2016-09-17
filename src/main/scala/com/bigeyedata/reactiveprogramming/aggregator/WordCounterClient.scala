@@ -14,14 +14,17 @@ import com.bigeyedata.reactiveprogramming.aggregator.WordCounterServer.FetchWebP
 object WordCounterClient {
   def props = Props(new WordCounterClient)
   case class StartAnalysisWebPages(uris: Seq[String], requestReceiver: ActorRef)
-  case class AnalysisResultsFetched(result: Long)
+  case class AnalysisResultsFetched(result: Seq[(String, Long)], totalCount: Long)
 }
 
 class WordCounterClient extends Actor with ActorLogging {
   def receive: Receive = {
     case StartAnalysisWebPages(urls, server) =>
       server ! FetchWebPages(urls, self)
-    case AnalysisResultsFetched(totalCount) =>
-      log.info(s"the total word counts is $totalCount")
+    case AnalysisResultsFetched(result, totalCount) =>
+      result.foreach{
+        case (word, counts) => log.info(s"the word $word which counts is $counts")
+      }
+      log.info(s"the total count is $totalCount")
   }
 }

@@ -12,14 +12,22 @@ import com.bigeyedata.reactiveprogramming.aggregator.ContentWordCounter.CountPag
 import com.bigeyedata.reactiveprogramming.aggregator.WordCounterAggregator.AnalysisResult
 
 object ContentWordCounter {
+
   case class CountPageContent(content: List[String])
+
 }
 
 class ContentWordCounter(aggregator: ActorRef) extends Actor with ActorLogging {
   def receive: Receive = {
     case CountPageContent(content) =>
-      val count = content.flatMap(l => l.split(" ")).distinct.size
-      log.info(s"the count of page is $count")
-      aggregator ! AnalysisResult(count)
+      val wordToCounts = content
+        .flatMap(l => l.split(" "))
+        .map(w => (w, 1))
+        .groupBy(_._1)
+        .map {
+        case (word, counts) => (word, counts.foldLeft(0L)(_ + _._2))
+      }.toSeq
+      log.info(s"the wordToCounts of page is $wordToCounts")
+      aggregator ! AnalysisResult(wordToCounts)
   }
 }

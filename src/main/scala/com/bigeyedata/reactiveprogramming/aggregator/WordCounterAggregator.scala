@@ -22,7 +22,7 @@ object WordCounterAggregator {
 
   case class StartAggregation(target: ActorRef, urls: Seq[String])
   case object BadCommand
-  case class AnalysisResult(count: Long)
+  case class AnalysisResult(wordToCount: Seq[(String, Long)])
 }
 
 class WordCounterAggregator extends Actor with Aggregator {
@@ -54,7 +54,10 @@ class WordCounterAggregator extends Actor with Aggregator {
 
     def respondIfDone(respondAnyway: Boolean = false) = {
       if (respondAnyway || analysisResults.size == urls.size) {
-        originalSender ! AggregatedAnalysisResult(analysisResults.map(_.count).sum)
+        val wordToCounts = analysisResults.flatMap(_.wordToCount).groupBy(_._1).map{
+          case (word, counts) => (word, counts.foldLeft(0L)(_ + _._2))
+        }.toSeq
+        originalSender ! AggregatedAnalysisResult(wordToCounts)
         context stop self
       }
     }
