@@ -18,15 +18,14 @@ object ContentWordCounter {
 }
 
 class ContentWordCounter(aggregator: ActorRef) extends Actor with ActorLogging {
+  import MapSeqImplicits._
+
   def receive: Receive = {
     case CountPageContent(content) =>
       val wordToCounts = content
         .flatMap(l => l.split(" "))
-        .map(w => (w, 1))
-        .groupBy(_._1)
-        .map {
-        case (word, counts) => (word, counts.foldLeft(0L)(_ + _._2))
-      }.toSeq
+        .map(w => (w, 1L))
+        .reduceByKey(_ + _)
       log.info(s"the wordToCounts of page is $wordToCounts")
       aggregator ! AnalysisResult(wordToCounts)
   }

@@ -53,10 +53,10 @@ class WordCounterAggregator extends Actor with Aggregator {
     }
 
     def respondIfDone(respondAnyway: Boolean = false) = {
+      import MapSeqImplicits._
+
       if (respondAnyway || analysisResults.size == urls.size) {
-        val wordToCounts = analysisResults.flatMap(_.wordToCount).groupBy(_._1).map{
-          case (word, counts) => (word, counts.foldLeft(0L)(_ + _._2))
-        }.toSeq
+        val wordToCounts = analysisResults.flatMap(_.wordToCount).reduceByKey(_ + _)
         originalSender ! AggregatedAnalysisResult(wordToCounts)
         context stop self
       }
